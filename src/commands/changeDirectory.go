@@ -6,9 +6,7 @@ import (
 )
 
 func ChangeCurrentDirectory(path string) string {
-	if !core.FsIoExists(path)	{
-		return "path dont exists."
-	}
+
 	if path[0] == '$' {
 		switch path {
 		case "$user":
@@ -19,6 +17,9 @@ func ChangeCurrentDirectory(path string) string {
 		}
 
 		return core.InterState.CurrentDirectory
+	}
+	if !core.FsIoExists(path)	{
+		return "path dont exists."
 	}
 
 	newPath := filepath.Join(core.InterState.CurrentDirectory, path)
