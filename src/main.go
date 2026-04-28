@@ -48,7 +48,7 @@ func dispatcher(input *string) string {
 
 	case "cd":
 		if len(args) < 2 {
-			return "uso: go <diretório>"
+			return "cd <dir>"
 		}
 		return commands.ChangeCurrentDirectory(args[1])
 	case "write":
