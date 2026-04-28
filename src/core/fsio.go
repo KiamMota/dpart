@@ -59,6 +59,18 @@ func FsIoMoveToTrash(name string) error {
 	return nil
 }
 
+func NormalizePath(base, input string) string {
+	var p string
+
+	if filepath.IsAbs(input) {
+		p = input
+	} else {
+		p = filepath.Join(base, input)
+	}
+
+	return filepath.Clean(p)
+}
+
 func FsIoAppendFile(name string, content string) error {
 	f, err := os.OpenFile(name, os.O_APPEND|os.O_CREATE|os.O_RDONLY, 0644)
 	if err != nil {

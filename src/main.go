@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"dpart/commands"
 	"dpart/commands/file"
+	"dpart/core"
 	"fmt"
 	"os"
 	"strings"
@@ -21,7 +22,6 @@ const (
 
 var UsedCommands []string
 
-var progState ProgramState = ProgramState{}
 
 func functionFileExists(param string) string {
 	_, err := os.Stat(param)
@@ -44,7 +44,7 @@ func dispatcher(input *string) string {
 		os.Exit(0)
 
 	case "pwd":
-		return progState.CurrentDirectory
+		return core.InterState.CurrentDirectory
 
 	case "cd":
 		if len(args) < 2 {
@@ -72,8 +72,8 @@ func main() {
 
 	userdir, _ := os.UserHomeDir()
 	pwd, _ := os.Getwd()
-	progState.CurrentDirectory = pwd
-	progState.UserDir = userdir
+	core.InterState.CurrentDirectory = pwd
+	core.InterState.UserDir = userdir
 
 	for {
 		fmt.Print("| > ")
