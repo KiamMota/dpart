@@ -10,6 +10,7 @@ import (
 
 type FileMetadata struct {
 	Name string
+	Absolute string
 	Size string 
 	ModifiedAt string
 	IsDirectory string
@@ -138,12 +139,15 @@ func EntryInspect(name string) (FileMetadata, error) {
 	}
 
 	var isDir string 
+	abs, err := filepath.Abs(name)
+	if err != nil { abs = ""}
 	if f.IsDir() {
 		isDir = StrTrue 
 	}
 
 	return FileMetadata{
 		Name:    f.Name(),
+		Absolute: abs,
 		Size:    strconv.FormatInt(f.Size(), 10),
 		IsDirectory:   isDir,
 		ModifiedAt: f.ModTime().String(),
