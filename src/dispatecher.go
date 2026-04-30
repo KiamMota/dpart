@@ -27,7 +27,9 @@ func Dispatcher(input *string ) string {
 	if len(args) == 0 {
 		return ""
 	}
-
+	if args[0]== "lua" {
+		return "lua is not implemented yet!"
+	}
 	command := args[0]
 
 	for i := 1; i < len(args); i++{
