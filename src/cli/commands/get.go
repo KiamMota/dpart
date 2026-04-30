@@ -7,6 +7,8 @@ import (
 
 func Get(param string) string {
 	f, err := core.Get(param)
+
+	if f == nil && err == nil { return core.StrNil}
 	if err != nil {
 		return err.Error()
 	}
@@ -15,7 +17,7 @@ func Get(param string) string {
 		return core.StrNil
 	}
 
-	data, err := json.Marshal(f)
+	data, err := json.MarshalIndent(f, "", " ")
 	if err != nil {
 		return err.Error()
 	}

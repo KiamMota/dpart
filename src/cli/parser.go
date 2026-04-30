@@ -49,6 +49,8 @@ func Dispatcher(input *string ) string {
 		if len(args) == 2{
 			return commands.Put(args[1], "")
 		}
+	case "remove":
+		return commands.Remove(args[1])
 	}
 
 	return "comando desconhecido"

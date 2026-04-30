@@ -11,7 +11,7 @@ func MacroTable(macro string) string {
 	case "pwd":
 		return InterState.CurrentDirectory
 	case "home":
-		return InterState.UserDir
+		return InterState.UserHomeDir
 	default: return macro
 	}
 }

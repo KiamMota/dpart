@@ -16,8 +16,6 @@ type FileMetadata struct {
 	Permissions string
 }
 
-
-
 func Put(name string, param string) (error) {
 	if(strings.Contains(name, "/")){
 
@@ -28,7 +26,10 @@ func Put(name string, param string) (error) {
 }
 
 func Remove(name string) error {
-	return os.RemoveAll(name)
+	if fsIoExists(name){
+		return os.RemoveAll(name)
+	}
+	return errors.New("file doenst exists")
 }
 
 func Get(name string) ([]FileMetadata, error) {
@@ -38,10 +39,10 @@ func Get(name string) ([]FileMetadata, error) {
 	}
 
 	if(!fsIoExists(name)){
-		return nil, errors.New("path doesnt exists: " + name)
+		return nil, nil 
  	 }
 
-	handle := make([]FileMetadata, 1)
+	handle := []FileMetadata{}
 
 	fs, e := EntryInspect(name)
 	if e != nil { return nil, e} 

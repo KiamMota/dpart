@@ -2,9 +2,10 @@ package main
 
 import (
 	"bufio"
+	"dpart/cli"
+	"dpart/core"
 	"fmt"
 	"os"
-	"dpart/core"
 )
 
 func main() {
@@ -13,6 +14,6 @@ func main() {
 	for {
 		print(">>> ")	
 		input, _ := reader.ReadString('\n') 
-		fmt.Printf("<<< %s\n", Dispatcher(&input))
+		fmt.Printf("<<< %s\n", cli.Dispatcher(&input))
 	}
 }
