@@ -41,10 +41,16 @@ func Dispatcher(input *string ) string {
 	case "pwd":
 		return core.InterState.CurrentDirectory
 	case "get":
+		if len(args) == 1 {
+			return commands.Get("")
+		}
 		return commands.Get(args[1])
 	case "put":
 		if len(args) == 2{
 			return commands.Put(args[1], "")
+		}
+		if len(args) == 3{
+			return commands.Put(args[1], args[2])
 		}
 	case "remove":
 		return commands.Remove(args[1])

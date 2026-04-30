@@ -18,12 +18,25 @@ type FileMetadata struct {
 }
 
 func Put(name string, param string) error {
-	if strings.Contains(name, "/") {
 
-		return (fsIoDirCreate(name))
+	src := resolvePath(InterState.CurrentDirectory, name)
+
+	if param == "" {
+		if strings.Contains(name, "/") {
+			return fsIoDirCreate(src)
+		}
+		_, err := fsIoFileCreate(src)
+		return err
 	}
-	_, err := fsIoFileCreate(name)
-	return err
+
+	rawDst := param
+	dst := resolvePath(InterState.CurrentDirectory, rawDst)
+
+	if rawDst == "../" || strings.HasSuffix(rawDst, "/") {
+		dst = filepath.Join(dst, filepath.Base(src))
+	}
+
+	return fsIoMove(src, dst)
 }
 
 func Remove(name string) error {
@@ -34,34 +47,49 @@ func Remove(name string) error {
 }
 
 func Get(name string) ([]FileMetadata, error) {
+		if name == "" {
+			return fsIoListDir(InterState.CurrentDirectory)
+		}
+    path := resolvePath(name, "")
 
-	if name == "./" {
-		return fsIoListDir(InterState.CurrentDirectory)
-	}
+    fs, err := EntryInspect(path)
+    if err != nil {
+        return nil, err
+    }
 
-	if !fsIoExists(name) {
-		return nil, nil
-	}
-
-	handle := []FileMetadata{}
-
-	fs, e := EntryInspect(name)
-	if e != nil {
-		return nil, e
-	}
-	return append(handle, fs), nil
+    return []FileMetadata{fs}, nil
 }
 
+func resolvePath(base, input string) string {
+    if input == "" {
+        return base
+    }
+
+    if input == "." || input == "./" {
+        return base
+    }
+
+    if filepath.IsAbs(input) {
+        return filepath.Clean(input)
+    }
+
+    return filepath.Clean(filepath.Join(base, input))
+}
 func ChangeDirectory(name string) error {
- if !fsIoExists(name) {
-	 return errors.New("Directory doenst exists: " + name)
- }
 
- abs, err := filepath.Abs(name)
- if err != nil {return err}
+	allpath := resolvePath(InterState.CurrentDirectory, name)
 
- InterState.SetCurrentDirectory(abs)
- return nil
+	info, err := os.Stat(allpath)
+	if err != nil {
+		return errors.New("Directory doesn't exist: " + name)
+	}
+
+	if !info.IsDir() {
+		return errors.New("Not a directory: " + name)
+	}
+
+	InterState.CurrentDirectory = allpath
+	return nil
 }
 
 func fsIoExists(filePath string) bool {
@@ -90,6 +118,14 @@ func fsIoDeleteEntry(name string) error {
 		return err
 	}
 	return nil
+}
+
+func fsIoMove(path string, newPath string) error {
+	if !fsIoExists(path) {
+		return errors.New("path doenst exists!")
+	}
+	err := os.Rename(path, newPath)
+	return err
 }
 
 func NormalizePath(base, input string) string {
@@ -132,11 +168,12 @@ func fsIoListDir(name string) ([]FileMetadata, error) {
 	}
 	handle := make([]FileMetadata, 0, len(entries))
 
-	for _, e := range entries {
-		meta, _ := EntryInspect(e.Name())
+	for _, entry := range entries {
+		fullPath := filepath.Join(name, entry.Name())
+
+		meta, _ := EntryInspect(fullPath)
 
 		handle = append(handle, meta)
-
 	}
 	return handle, nil
 }
@@ -152,13 +189,12 @@ func EntryInspect(name string) (FileMetadata, error) {
 		abs = ""
 	}
 
-
 	return FileMetadata{
-		Name:        f.Name(),
-		Type: fileTypeEntry(name),
-		Absolute:    abs,
-		Size:        strconv.FormatInt(f.Size(), 10),
-		ModifiedAt:  f.ModTime().String(),
+		Name:       f.Name(),
+		Type:       fileTypeEntry(name),
+		Absolute:   abs,
+		Size:       strconv.FormatInt(f.Size(), 10),
+		ModifiedAt: f.ModTime().String(),
 	}, nil
 }
 
@@ -238,7 +274,7 @@ func fileTypeEntry(filePath string) string {
 	case ".mp4":
 		return "MP4"
 	case ".mkv":
-		return "MKV" 
+		return "MKV"
 	case ".avi":
 		return "AVI"
 
