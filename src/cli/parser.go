@@ -1,7 +1,7 @@
-package main
+package cli 
 
 import (
-	"dpart/commands"
+	"dpart/cli/commands"
 	"dpart/core"
 	"fmt"
 	"os"
