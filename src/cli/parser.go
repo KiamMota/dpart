@@ -1,25 +1,20 @@
-package cli 
+package cli
 
 import (
 	"dpart/cli/commands"
 	"dpart/core"
-	"fmt"
 	"os"
+	"regexp"
 	"strings"
 )
 
-func parseMacro(macro string) string {
-	if macro [0] != '$'{ return macro}
-		if (macro [1] == '(' && macro[len(macro) -1] == ')'){
-		pos := strings.Index(macro, ")")
-		if pos == -1 {
-			return macro
-		}
-		macroWord := macro[2:pos]
-		fmt.Println("expanding macro: ", macroWord)
-		return core.MacroTable(macroWord)	
-	}
-	return macro
+var macroRegex = regexp.MustCompile(`\$\((.*?)\)`)
+
+func expandMacros(input string) string {
+	return macroRegex.ReplaceAllStringFunc(input, func(match string) string {
+		key := strings.TrimSpace(match[2 : len(match)-1])
+		return core.MacroTable(key)
+	})
 }
 
 func Dispatcher(input *string ) string {
@@ -33,7 +28,7 @@ func Dispatcher(input *string ) string {
 	command := args[0]
 
 	for i := 1; i < len(args); i++{
-		args[i] =parseMacro(args[i])	
+		args[i] = expandMacros(args[i])	
 	}	
 
 	switch command {
@@ -41,6 +36,8 @@ func Dispatcher(input *string ) string {
 		return ""
 	case "exit":	
 		os.Exit(0)
+	case "cd":
+		return commands.Cd(args[1])
 	case "pwd":
 		return core.InterState.CurrentDirectory
 	case "get":

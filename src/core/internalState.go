@@ -17,15 +17,15 @@ func (s* InternalState) StartInternalState() {
 	s.Clipboard = ""
 }
 
-func (s InternalState) GetCurrentDirectory() string {
+func (s* InternalState) GetCurrentDirectory() string {
 	return s.CurrentDirectory
 }
-func (s InternalState) GetUserHomeDirectory() string {
+func (s* InternalState) GetUserHomeDirectory() string {
 	return s.UserHomeDir
 }
-func (s InternalState) SetCurrentDirectory(pwd string) {
+func (s* InternalState) SetCurrentDirectory(pwd string) {
 	s.CurrentDirectory = pwd
 }
-func (s InternalState) SetClipboard(clip string) {
+func (s* InternalState) SetClipboard(clip string) {
 	s.Clipboard = clip
 }

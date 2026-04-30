@@ -50,7 +50,18 @@ func Get(name string) ([]FileMetadata, error) {
 		return nil, e
 	}
 	return append(handle, fs), nil
+}
 
+func ChangeDirectory(name string) error {
+ if !fsIoExists(name) {
+	 return errors.New("Directory doenst exists: " + name)
+ }
+
+ abs, err := filepath.Abs(name)
+ if err != nil {return err}
+
+ InterState.SetCurrentDirectory(abs)
+ return nil
 }
 
 func fsIoExists(filePath string) bool {
